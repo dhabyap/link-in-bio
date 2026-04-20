@@ -22,6 +22,9 @@ Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
+// Deployment Helper (for Shared Hosting)
+Route::get('/deploy/setup', [\App\Http\Controllers\DeploymentController::class, 'setup']);
+
 // Admin Routes
 Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(function () {
     Route::resource('links', \App\Http\Controllers\Admin\LinkController::class);
