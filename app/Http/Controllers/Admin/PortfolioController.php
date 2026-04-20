@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Portfolio;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 
 class PortfolioController extends Controller
 {
@@ -43,7 +43,10 @@ class PortfolioController extends Controller
             $validated['thumbnail_path'] = $request->file('thumbnail')->store('portfolios', 'public');
         }
 
-        Auth::user()->portfolios()->create($validated);
+        $portfolio = Auth::user()->portfolios()->create($validated);
+
+        // Invalidate public profile cache for this user
+        Cache::forget("profile_{$portfolio->user->username}");
 
         return redirect()->route('admin.portfolios.index')->with('success', 'Portfolio created successfully.');
     }
@@ -78,6 +81,9 @@ class PortfolioController extends Controller
 
         $portfolio->update($validated);
 
+        // Invalidate public profile cache for this user
+        Cache::forget("profile_{$portfolio->user->username}");
+
         return redirect()->route('admin.portfolios.index')->with('success', 'Portfolio updated successfully.');
     }
 
@@ -88,6 +94,9 @@ class PortfolioController extends Controller
     {
         $this->authorizeUser($portfolio);
         $portfolio->delete();
+
+        // Invalidate public profile cache for this user
+        Cache::forget("profile_{$portfolio->user->username}");
 
         return redirect()->route('admin.portfolios.index')->with('success', 'Portfolio deleted successfully.');
     }
