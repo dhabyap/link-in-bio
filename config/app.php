@@ -185,4 +185,6 @@ return [
         // 'Example' => App\Facades\Example::class,
     ])->toArray(),
 
+    'deployment_token' => env('DEPLOYMENT_TOKEN'),
+
 ];

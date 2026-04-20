@@ -11,11 +11,12 @@
 | Fitur | Keterangan |
 |---|---|
 | 🔗 **Custom URL** | Setiap user punya link profil unik: `domain.com/username` |
-| 👤 **Profil Lengkap** | Upload avatar, isi bio, dan pilih warna tema |
-| 📎 **Manajemen Link** | Tambah, edit, hapus, dan atur urutan semua link sosmed Anda |
-| 🖼️ **Mini Portfolio** | Tampilkan karya terbaik Anda dengan gambar & deskripsi |
-| 🔒 **Autentikasi Aman** | Login, registrasi, reset password, dan verifikasi email |
-| ⚡ **Hosting-Friendly** | Berjalan di cPanel Shared Hosting standar, PHP 8.1+ |
+| 👤 **Profil Lengkap** | Upload avatar, isi bio, dan pilih warna tema dinamis |
+| 📎 **Manajemen Link** | Tambah, edit, hapus, dan atur urutan semua link Anda |
+| 🖼️ **Mini Portfolio** | Tampilkan karya terbaik dengan efek glassmorphism |
+| 🔄 **Auto-Caching** | Performa ultra cepat dengan server-side caching |
+| 🔒 **Auth & Security** | Login, registrasi, dan Deployment Token terenkripsi |
+| ⚡ **Hosting-Friendly** | Pengaturan otomatis via browser (tanpa butuh SSH) |
 
 ---
 
@@ -23,143 +24,78 @@
 
 - **Framework**: Laravel 10 (PHP 8.1+)
 - **Database**: MySQL (production) / SQLite (testing)
-- **Frontend**: Blade Templates + Tailwind CSS + Alpine.js
+- **Frontend**: Blade + Tailwind CSS + Alpine.js (Premium UI)
 - **Build Tool**: Vite
 - **Auth**: Laravel Breeze
 
 ---
 
-## 🚀 Panduan Instalasi (Localhost / Developer)
+## 🚀 Panduan Instalasi Lokal
 
-### Prasyarat
-
-Pastikan software berikut sudah terinstal di komputer Anda:
-
-- [PHP](https://www.php.net/downloads) minimal versi **8.1**
-- [Composer](https://getcomposer.org/) (PHP Package Manager)
-- [Node.js](https://nodejs.org/) v16+ dan NPM
-- [MySQL](https://dev.mysql.com/) atau gunakan SQLite untuk lebih praktis
-
----
-
-### Langkah 1 — Clone Repositori
+### Langkah 1 — Clone & Install
 
 ```bash
 git clone https://github.com/dhabyap/link-in-bio.git
 cd link-in-bio
-```
-
-### Langkah 2 — Install Dependensi
-
-```bash
 composer install
 npm install
 ```
 
-### Langkah 3 — Konfigurasi Environment
-
-Copy file konfigurasi contoh, lalu buka dan sesuaikan isinya:
+### Langkah 2 — Konfigurasi
 
 ```bash
 cp .env.example .env
-```
-
-Buka file `.env` dan atur bagian database. Untuk lokal dengan **MySQL**:
-
-```dotenv
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=link_in_bio
-DB_USERNAME=root
-DB_PASSWORD=
-```
-
-> **💡 Praktis pakai SQLite?** Ubah `DB_CONNECTION=sqlite`, buat filenya dengan `touch database/database.sqlite`, lalu hapus/komentari baris `DB_HOST`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`.
-
-### Langkah 4 — Generate Key & Migrasi Database
-
-```bash
 php artisan key:generate
-php artisan migrate
 ```
 
-### Langkah 5 — Symlink Storage (WAJIB untuk Foto/Gambar)
+Sesuaikan `DB_DATABASE` di `.env`, lalu jalankan:
 
 ```bash
+php artisan migrate
 php artisan storage:link
 ```
 
-> Perintah ini menghubungkan folder penyimpanan gambar ke folder `public` agar bisa diakses melalui browser.
+### Langkah 3 — Jalankan
 
-### Langkah 6 — Kompilasi Aset & Jalankan Aplikasi
+Buka 2 tab terminal:
+- Tab 1: `php artisan serve`
+- Tab 2: `npm run dev`
 
-Buka **2 tab terminal** secara bersamaan:
-
-**Tab 1 — Laravel Server:**
-```bash
-php artisan serve
-```
-
-**Tab 2 — Vite (Frontend):**
-```bash
-npm run dev
-```
-
-Buka browser dan akses: **http://localhost:8000** ✅
+Akses: **http://localhost:8000** ✅
 
 ---
 
-## 📖 Cara Penggunaan
+## 🌍 Panduan Deployment cPanel (Manual / Tanpa SSH)
 
-### 1. Buat Akun
-Buka halaman `/register` dan isi formulir:
-- **Name**: Nama lengkap Anda
-- **Username**: Ini akan jadi URL profil Anda (wajib huruf, angka, atau `-` dan `_`, **tanpa spasi**)
-- **Email** dan **Password**
+Jika Anda menggunakan Shared Hosting tanpa akses terminal/SSH, ikuti langkah berikut:
 
-### 2. Atur Profil Anda
-Setelah login, klik nama Anda di pojok kanan atas → pilih **Profile**.
-- Upload **Foto Profil (Avatar)**
-- Isi **Bio** singkat
-- Pilih **Warna Tema** untuk tampilan publik Anda
-
-Klik **Save** setelah selesai.
-
-### 3. Tambah Link
-Di menu navigasi atas, klik **Links** → **Add New Link**.
-- **Title**: Nama link (contoh: `Instagram Saya`)
-- **URL**: Alamat lengkap (contoh: `https://instagram.com/username`)
-- **Icon**: Opsional, bisa emoji (🔗) atau kelas FontAwesome (`fas fa-instagram`)
-- **Sort Order**: Angka urutan tampil (1 muncul paling atas)
-- Centang **Active** agar tampil di profil publik
-
-### 4. Tambah Portofolio
-Di menu navigasi atas, klik **Portfolios** → **Add New Portfolio Item**.
-- **Title**: Nama karya Anda
-- **Description**: Deskripsi singkat
-- **Thumbnail**: Upload gambar karya (maks. 2MB)
-- **External API URL**: Opsional, link ke demo atau repositori
-
-### 5. Lihat Profil Publik Anda
-Buka tab baru di browser dan ketik:
-
+### 1. Persiapan Aset
+Di komputer lokal Anda, jalankan perintah kompilasi:
+```bash
+npm run build
 ```
-http://localhost:8000/{username-Anda}
+Ini akan menghasilkan folder `public/build`.
+
+### 2. Upload File ke cPanel
+1. Upload semua folder (kecuali `node_modules`, `.git`, `tests`) ke folder Laravel Anda (misal: `/home/user/laravel-app`).
+2. Pindahkan isi folder `public/` (termasuk folder `build`) ke `public_html/`.
+3. Buka `public_html/index.php` dan sesuaikan path `vendor/autoload.php` serta `bootstrap/app.php`.
+
+### 3. Konfigurasi Keamanan Deployment
+Buka file `.env` di server dan tambahkan token rahasia:
+```dotenv
+DEPLOYMENT_TOKEN=isi_dengan_token_acak_yang_panjang
 ```
 
-Inilah tampilan yang akan dilihat oleh siapapun yang mengunjungi profil Anda!
+### 4. Setup Otomatis via Browser
+Tanpa SSH, Anda bisa menjalankan perintah Artisan melalui browser dengan bantuan token di atas:
 
----
-
-## 🌍 Deployment ke cPanel (Shared Hosting)
-
-1. **Upload semua file** (kecuali folder `node_modules`) ke server via FTP.
-2. **Konten folder `public/`** disalin ke `public_html/`.
-3. Sesuaikan file `public/index.php` agar path-nya menunjuk ke lokasi Laravel yang benar.
-4. Buat database MySQL baru di cPanel, lalu konfigurasikan `.env` di server.
-5. Pastikan versi PHP di **cPanel → Select PHP Version** disetel minimal ke **PHP 8.1**.
-6. Jalankan via SSH (jika tersedia): `php artisan migrate` dan `php artisan storage:link`.
+- **Migrasi Database:** 
+  `https://domain.com/deploy/setup?action=migrate&token=TOKEN_ANDA`
+- **Simbolik Link (Penting!)**: 
+  `https://domain.com/deploy/setup?action=storage-link&token=TOKEN_ANDA`
+- **Optimasi Performa**: 
+  `https://domain.com/deploy/setup?action=optimize&token=TOKEN_ANDA`
 
 ---
 
@@ -169,10 +105,10 @@ Inilah tampilan yang akan dilihat oleh siapapun yang mengunjungi profil Anda!
 php artisan test
 ```
 
-Pastikan semua **25 test** berhasil dijalankan sebelum melakukan deployment.
+Pastikan semua test (termasuk `DeploymentTest`) berhasil dijalankan.
 
 ---
 
 ## 📄 Lisensi
 
-Proyek ini adalah open-source dan tersedia di bawah lisensi [MIT](https://opensource.org/licenses/MIT).
+Proyek ini tersedia di bawah lisensi [MIT](https://opensource.org/licenses/MIT).
