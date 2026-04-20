@@ -24,7 +24,8 @@ Route::get('/dashboard', function () {
 
 // Admin Routes
 Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(function () {
-    // CRUD routes for links and portfolios will be added here
+    Route::resource('links', \App\Http\Controllers\Admin\LinkController::class);
+    Route::resource('portfolios', \App\Http\Controllers\Admin\PortfolioController::class);
 });
 
 Route::middleware('auth')->group(function () {
