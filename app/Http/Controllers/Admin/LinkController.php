@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Link;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 
 class LinkController extends Controller
 {
@@ -39,7 +39,10 @@ class LinkController extends Controller
             'is_active' => 'boolean',
         ]);
 
-        Auth::user()->links()->create($validated);
+        $link = Auth::user()->links()->create($validated);
+
+        // Invalidate public profile cache for this user
+        Cache::forget("profile_{$link->user->username}");
 
         return redirect()->route('admin.links.index')->with('success', 'Link created successfully.');
     }
@@ -70,6 +73,9 @@ class LinkController extends Controller
 
         $link->update($validated);
 
+        // Invalidate public profile cache for this user
+        Cache::forget("profile_{$link->user->username}");
+
         return redirect()->route('admin.links.index')->with('success', 'Link updated successfully.');
     }
 
@@ -80,6 +86,9 @@ class LinkController extends Controller
     {
         $this->authorizeUser($link);
         $link->delete();
+
+        // Invalidate public profile cache for this user
+        Cache::forget("profile_{$link->user->username}");
 
         return redirect()->route('admin.links.index')->with('success', 'Link deleted successfully.');
     }
