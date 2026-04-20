@@ -1,66 +1,178 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🔗 Link-in-Bio & Mini Portfolio
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+> Platform "Link-in-Bio" ringan yang bisa di-deploy ke **Shared Hosting (cPanel)** — tanpa server khusus, tanpa Redis, tanpa konfigurasi rumit.
 
-## About Laravel
+[![Tests](https://github.com/dhabyap/link-in-bio/actions/workflows/laravel.yml/badge.svg)](https://github.com/dhabyap/link-in-bio/actions)
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 🌟 Fitur Utama
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+| Fitur | Keterangan |
+|---|---|
+| 🔗 **Custom URL** | Setiap user punya link profil unik: `domain.com/username` |
+| 👤 **Profil Lengkap** | Upload avatar, isi bio, dan pilih warna tema |
+| 📎 **Manajemen Link** | Tambah, edit, hapus, dan atur urutan semua link sosmed Anda |
+| 🖼️ **Mini Portfolio** | Tampilkan karya terbaik Anda dengan gambar & deskripsi |
+| 🔒 **Autentikasi Aman** | Login, registrasi, reset password, dan verifikasi email |
+| ⚡ **Hosting-Friendly** | Berjalan di cPanel Shared Hosting standar, PHP 8.1+ |
 
-## Learning Laravel
+---
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## 🛠️ Teknologi yang Digunakan
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+- **Framework**: Laravel 10 (PHP 8.1+)
+- **Database**: MySQL (production) / SQLite (testing)
+- **Frontend**: Blade Templates + Tailwind CSS + Alpine.js
+- **Build Tool**: Vite
+- **Auth**: Laravel Breeze
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+---
 
-## Laravel Sponsors
+## 🚀 Panduan Instalasi (Localhost / Developer)
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### Prasyarat
 
-### Premium Partners
+Pastikan software berikut sudah terinstal di komputer Anda:
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+- [PHP](https://www.php.net/downloads) minimal versi **8.1**
+- [Composer](https://getcomposer.org/) (PHP Package Manager)
+- [Node.js](https://nodejs.org/) v16+ dan NPM
+- [MySQL](https://dev.mysql.com/) atau gunakan SQLite untuk lebih praktis
 
-## Contributing
+---
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### Langkah 1 — Clone Repositori
 
-## Code of Conduct
+```bash
+git clone https://github.com/dhabyap/link-in-bio.git
+cd link-in-bio
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### Langkah 2 — Install Dependensi
 
-## Security Vulnerabilities
+```bash
+composer install
+npm install
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### Langkah 3 — Konfigurasi Environment
 
-## License
+Copy file konfigurasi contoh, lalu buka dan sesuaikan isinya:
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```bash
+cp .env.example .env
+```
+
+Buka file `.env` dan atur bagian database. Untuk lokal dengan **MySQL**:
+
+```dotenv
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=link_in_bio
+DB_USERNAME=root
+DB_PASSWORD=
+```
+
+> **💡 Praktis pakai SQLite?** Ubah `DB_CONNECTION=sqlite`, buat filenya dengan `touch database/database.sqlite`, lalu hapus/komentari baris `DB_HOST`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`.
+
+### Langkah 4 — Generate Key & Migrasi Database
+
+```bash
+php artisan key:generate
+php artisan migrate
+```
+
+### Langkah 5 — Symlink Storage (WAJIB untuk Foto/Gambar)
+
+```bash
+php artisan storage:link
+```
+
+> Perintah ini menghubungkan folder penyimpanan gambar ke folder `public` agar bisa diakses melalui browser.
+
+### Langkah 6 — Kompilasi Aset & Jalankan Aplikasi
+
+Buka **2 tab terminal** secara bersamaan:
+
+**Tab 1 — Laravel Server:**
+```bash
+php artisan serve
+```
+
+**Tab 2 — Vite (Frontend):**
+```bash
+npm run dev
+```
+
+Buka browser dan akses: **http://localhost:8000** ✅
+
+---
+
+## 📖 Cara Penggunaan
+
+### 1. Buat Akun
+Buka halaman `/register` dan isi formulir:
+- **Name**: Nama lengkap Anda
+- **Username**: Ini akan jadi URL profil Anda (wajib huruf, angka, atau `-` dan `_`, **tanpa spasi**)
+- **Email** dan **Password**
+
+### 2. Atur Profil Anda
+Setelah login, klik nama Anda di pojok kanan atas → pilih **Profile**.
+- Upload **Foto Profil (Avatar)**
+- Isi **Bio** singkat
+- Pilih **Warna Tema** untuk tampilan publik Anda
+
+Klik **Save** setelah selesai.
+
+### 3. Tambah Link
+Di menu navigasi atas, klik **Links** → **Add New Link**.
+- **Title**: Nama link (contoh: `Instagram Saya`)
+- **URL**: Alamat lengkap (contoh: `https://instagram.com/username`)
+- **Icon**: Opsional, bisa emoji (🔗) atau kelas FontAwesome (`fas fa-instagram`)
+- **Sort Order**: Angka urutan tampil (1 muncul paling atas)
+- Centang **Active** agar tampil di profil publik
+
+### 4. Tambah Portofolio
+Di menu navigasi atas, klik **Portfolios** → **Add New Portfolio Item**.
+- **Title**: Nama karya Anda
+- **Description**: Deskripsi singkat
+- **Thumbnail**: Upload gambar karya (maks. 2MB)
+- **External API URL**: Opsional, link ke demo atau repositori
+
+### 5. Lihat Profil Publik Anda
+Buka tab baru di browser dan ketik:
+
+```
+http://localhost:8000/{username-Anda}
+```
+
+Inilah tampilan yang akan dilihat oleh siapapun yang mengunjungi profil Anda!
+
+---
+
+## 🌍 Deployment ke cPanel (Shared Hosting)
+
+1. **Upload semua file** (kecuali folder `node_modules`) ke server via FTP.
+2. **Konten folder `public/`** disalin ke `public_html/`.
+3. Sesuaikan file `public/index.php` agar path-nya menunjuk ke lokasi Laravel yang benar.
+4. Buat database MySQL baru di cPanel, lalu konfigurasikan `.env` di server.
+5. Pastikan versi PHP di **cPanel → Select PHP Version** disetel minimal ke **PHP 8.1**.
+6. Jalankan via SSH (jika tersedia): `php artisan migrate` dan `php artisan storage:link`.
+
+---
+
+## 🧪 Menjalankan Testing
+
+```bash
+php artisan test
+```
+
+Pastikan semua **25 test** berhasil dijalankan sebelum melakukan deployment.
+
+---
+
+## 📄 Lisensi
+
+Proyek ini adalah open-source dan tersedia di bawah lisensi [MIT](https://opensource.org/licenses/MIT).
