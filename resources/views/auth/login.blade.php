@@ -1,4 +1,7 @@
 <x-guest-layout>
+    <h1 class="login-title">MASUK<br>AKUN</h1>
+    <p class="login-sub">Belum punya akun? <a href="{{ route('register') }}">Daftar sekarang →</a></p>
+
     <!-- Session Status -->
     <x-auth-session-status class="mb-4" :status="session('status')" />
 
@@ -6,42 +9,32 @@
         @csrf
 
         <!-- Email Address -->
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
+        <div class="form-group">
+            <label for="email" class="input-label">{{ __('Email') }}</label>
+            <input id="email" class="input" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" placeholder="kamu@email.com" />
             <x-input-error :messages="$errors->get('email')" class="mt-2" />
         </div>
 
         <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
-
-            <x-text-input id="password" class="block mt-1 w-full"
+        <div class="form-group">
+            <label for="password" class="input-label">{{ __('Password') }}</label>
+            <input id="password" class="input"
                             type="password"
                             name="password"
-                            required autocomplete="current-password" />
-
+                            required autocomplete="current-password" placeholder="••••••••" />
             <x-input-error :messages="$errors->get('password')" class="mt-2" />
         </div>
 
-        <!-- Remember Me -->
-        <div class="block mt-4">
-            <label for="remember_me" class="inline-flex items-center">
-                <input id="remember_me" type="checkbox" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500" name="remember">
-                <span class="ms-2 text-sm text-gray-600">{{ __('Remember me') }}</span>
-            </label>
-        </div>
+        <button class="btn" style="width: 100%; justify-content: center; display: flex; margin-bottom: 8px;">
+            {{ __('MASUK →') }}
+        </button>
 
-        <div class="flex items-center justify-end mt-4">
-            @if (Route::has('password.request'))
-                <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('password.request') }}">
-                    {{ __('Forgot your password?') }}
+        @if (Route::has('password.request'))
+            <p class="login-toggle">
+                <a href="{{ route('password.request') }}" style="opacity: 0.5; font-size: 11px; color: rgba(255,255,255,0.4)">
+                    {{ __('Lupa password?') }}
                 </a>
-            @endif
-
-            <x-primary-button class="ms-3">
-                {{ __('Log in') }}
-            </x-primary-button>
-        </div>
+            </p>
+        @endif
     </form>
 </x-guest-layout>

@@ -1,7 +1,6 @@
 <x-guest-layout>
-    <div class="mb-4 text-sm text-gray-600">
-        {{ __('Forgot your password? No problem. Just let us know your email address and we will email you a password reset link that will allow you to choose a new one.') }}
-    </div>
+    <h1 class="login-title">RESET<br>PASS</h1>
+    <p class="login-sub">{{ __('Lupa password? Masukkan email kamu untuk mendapatkan link reset.') }}</p>
 
     <!-- Session Status -->
     <x-auth-session-status class="mb-4" :status="session('status')" />
@@ -10,16 +9,14 @@
         @csrf
 
         <!-- Email Address -->
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus />
+        <div class="form-group">
+            <label for="email" class="input-label">{{ __('Email') }}</label>
+            <input id="email" class="input" type="email" name="email" :value="old('email')" required autofocus placeholder="kamu@email.com" />
             <x-input-error :messages="$errors->get('email')" class="mt-2" />
         </div>
 
-        <div class="flex items-center justify-end mt-4">
-            <x-primary-button>
-                {{ __('Email Password Reset Link') }}
-            </x-primary-button>
-        </div>
+        <button class="btn" style="width: 100%; justify-content: center; display: flex;">
+            {{ __('KIRIM RESET LINK →') }}
+        </button>
     </form>
 </x-guest-layout>
