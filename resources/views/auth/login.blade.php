@@ -10,24 +10,24 @@
 
         <!-- Email Address -->
         <div class="form-group">
-            <label for="email" class="input-label">{{ __('Email') }}</label>
-            <input id="email" class="input" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" placeholder="kamu@email.com" />
+            <x-input-label for="email" :value="__('Email')" />
+            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" placeholder="kamu@email.com" />
             <x-input-error :messages="$errors->get('email')" class="mt-2" />
         </div>
 
         <!-- Password -->
         <div class="form-group">
-            <label for="password" class="input-label">{{ __('Password') }}</label>
-            <input id="password" class="input"
+            <x-input-label for="password" :value="__('Password')" />
+            <x-text-input id="password" class="block mt-1 w-full"
                             type="password"
                             name="password"
                             required autocomplete="current-password" placeholder="••••••••" />
             <x-input-error :messages="$errors->get('password')" class="mt-2" />
         </div>
 
-        <button class="btn" style="width: 100%; justify-content: center; display: flex; margin-bottom: 8px;">
+        <x-primary-button style="width: 100%; justify-content: center; display: flex; margin-bottom: 8px;">
             {{ __('MASUK →') }}
-        </button>
+        </x-primary-button>
 
         @if (Route::has('password.request'))
             <p class="login-toggle">
