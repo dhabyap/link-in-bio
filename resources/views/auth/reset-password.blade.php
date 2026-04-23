@@ -1,4 +1,7 @@
 <x-guest-layout>
+    <h1 class="login-title">BARU<br>PASS</h1>
+    <p class="login-sub">{{ __('Masukkan password baru kamu untuk mengakses akun kembali.') }}</p>
+
     <form method="POST" action="{{ route('password.store') }}">
         @csrf
 
@@ -6,34 +9,30 @@
         <input type="hidden" name="token" value="{{ $request->route('token') }}">
 
         <!-- Email Address -->
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email', $request->email)" required autofocus autocomplete="username" />
+        <div class="form-group">
+            <label for="email" class="input-label">{{ __('Email') }}</label>
+            <input id="email" class="input" type="email" name="email" :value="old('email', $request->email)" required autofocus autocomplete="username" placeholder="kamu@email.com" />
             <x-input-error :messages="$errors->get('email')" class="mt-2" />
         </div>
 
         <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
-            <x-text-input id="password" class="block mt-1 w-full" type="password" name="password" required autocomplete="new-password" />
+        <div class="form-group">
+            <label for="password" class="input-label">{{ __('Password') }}</label>
+            <input id="password" class="input" type="password" name="password" required autocomplete="new-password" placeholder="Min. 8 karakter" />
             <x-input-error :messages="$errors->get('password')" class="mt-2" />
         </div>
 
         <!-- Confirm Password -->
-        <div class="mt-4">
-            <x-input-label for="password_confirmation" :value="__('Confirm Password')" />
-
-            <x-text-input id="password_confirmation" class="block mt-1 w-full"
+        <div class="form-group">
+            <label for="password_confirmation" class="input-label">{{ __('Confirm Password') }}</label>
+            <input id="password_confirmation" class="input"
                                 type="password"
-                                name="password_confirmation" required autocomplete="new-password" />
-
+                                name="password_confirmation" required autocomplete="new-password" placeholder="Ulangi password" />
             <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
         </div>
 
-        <div class="flex items-center justify-end mt-4">
-            <x-primary-button>
-                {{ __('Reset Password') }}
-            </x-primary-button>
-        </div>
+        <button class="btn" style="width: 100%; justify-content: center; display: flex;">
+            {{ __('SIMPAN PASSWORD BARU →') }}
+        </button>
     </form>
 </x-guest-layout>
