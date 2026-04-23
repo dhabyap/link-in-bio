@@ -1,0 +1,1632 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LINKBRUT — Your Links, Unfiltered</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&family=Bebas+Neue&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  /* ===== RESET & BASE ===== */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  :root {
+    --black: #0a0a0a;
+    --white: #f5f0e8;
+    --yellow: #FFE500;
+    --red: #FF2B2B;
+    --blue: #0033FF;
+    --border: 3px solid var(--black);
+    --border-thick: 5px solid var(--black);
+    --shadow: 6px 6px 0px var(--black);
+    --shadow-lg: 10px 10px 0px var(--black);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Space Mono', monospace;
+    background: var(--white);
+    color: var(--black);
+    overflow-x: hidden;
+    cursor: crosshair;
+  }
+
+  /* ===== NOISE TEXTURE OVERLAY ===== */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.4;
+  }
+
+  /* ===== PAGES ===== */
+  .page { display: none; min-height: 100vh; }
+  .page.active { display: block; }
+
+  /* ===== TYPOGRAPHY ===== */
+  .display { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.02em; }
+  .serif { font-family: 'Instrument Serif', serif; }
+  .mono { font-family: 'Space Mono', monospace; }
+
+  /* ===== BUTTONS ===== */
+  .btn {
+    display: inline-block;
+    font-family: 'Space Mono', monospace;
+    font-weight: 700;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 14px 28px;
+    border: var(--border-thick);
+    background: var(--yellow);
+    color: var(--black);
+    cursor: pointer;
+    text-decoration: none;
+    transition: transform 0.08s, box-shadow 0.08s;
+    box-shadow: var(--shadow);
+    position: relative;
+    white-space: nowrap;
+  }
+  .btn:hover { transform: translate(-3px, -3px); box-shadow: 9px 9px 0px var(--black); }
+  .btn:active { transform: translate(3px, 3px); box-shadow: 3px 3px 0px var(--black); }
+  .btn-black { background: var(--black); color: var(--white); }
+  .btn-red { background: var(--red); color: var(--white); }
+  .btn-white { background: var(--white); color: var(--black); }
+  .btn-blue { background: var(--blue); color: var(--white); }
+
+  /* ===== INPUTS ===== */
+  .input {
+    width: 100%;
+    font-family: 'Space Mono', monospace;
+    font-size: 14px;
+    padding: 14px 16px;
+    border: var(--border-thick);
+    background: var(--white);
+    color: var(--black);
+    outline: none;
+    transition: box-shadow 0.1s;
+  }
+  .input:focus { box-shadow: var(--shadow); background: var(--yellow); }
+  .input::placeholder { color: #888; }
+  .input-label {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-bottom: 8px;
+  }
+
+  /* ===== MARQUEE ===== */
+  .marquee-wrap {
+    background: var(--black);
+    color: var(--yellow);
+    padding: 12px 0;
+    overflow: hidden;
+    border-top: var(--border-thick);
+    border-bottom: var(--border-thick);
+  }
+  .marquee-track {
+    display: flex;
+    white-space: nowrap;
+    animation: marquee 18s linear infinite;
+  }
+  .marquee-track span {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 0.15em;
+    padding: 0 40px;
+  }
+  @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+  /* ===== SCROLLBAR ===== */
+  ::-webkit-scrollbar { width: 8px; }
+  ::-webkit-scrollbar-track { background: var(--white); }
+  ::-webkit-scrollbar-thumb { background: var(--black); border: 2px solid var(--white); }
+
+  /* ===================================================
+     PAGE 1 — LANDING
+  =================================================== */
+  #page-landing {
+    background: var(--white);
+  }
+
+  /* NAV */
+  .nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 40px;
+    border-bottom: var(--border-thick);
+    background: var(--white);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .nav-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 36px;
+    letter-spacing: 0.05em;
+    color: var(--black);
+    text-decoration: none;
+  }
+  .nav-logo span { color: var(--red); }
+  .nav-links { display: flex; gap: 8px; align-items: center; }
+
+  /* HERO */
+  .hero {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: calc(100vh - 82px);
+  }
+  .hero-left {
+    padding: 60px 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-right: var(--border-thick);
+  }
+  .hero-badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    background: var(--red);
+    color: var(--white);
+    padding: 6px 14px;
+    border: var(--border);
+    margin-bottom: 28px;
+    box-shadow: 4px 4px 0 var(--black);
+    width: fit-content;
+  }
+  .hero-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(72px, 10vw, 130px);
+    line-height: 0.92;
+    letter-spacing: 0.01em;
+    margin-bottom: 28px;
+  }
+  .hero-title .outline {
+    -webkit-text-stroke: 3px var(--black);
+    color: transparent;
+  }
+  .hero-title .fill-yellow { color: var(--yellow); -webkit-text-stroke: 3px var(--black); }
+  .hero-desc {
+    font-size: 15px;
+    line-height: 1.7;
+    max-width: 420px;
+    margin-bottom: 40px;
+    opacity: 0.8;
+  }
+  .hero-actions { display: flex; gap: 16px; flex-wrap: wrap; }
+
+  .hero-right {
+    background: var(--black);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-right::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      -45deg, transparent, transparent 20px,
+      rgba(255,229,0,0.04) 20px, rgba(255,229,0,0.04) 21px
+    );
+  }
+
+  /* PHONE MOCKUP */
+  .phone-mockup {
+    width: 240px;
+    background: var(--white);
+    border: 4px solid var(--yellow);
+    border-radius: 0;
+    box-shadow: 14px 14px 0px var(--yellow);
+    position: relative;
+    z-index: 2;
+    overflow: hidden;
+    animation: float 3s ease-in-out infinite;
+  }
+  @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+  .phone-header {
+    background: var(--yellow);
+    padding: 16px;
+    text-align: center;
+    border-bottom: 3px solid var(--black);
+  }
+  .phone-avatar {
+    width: 56px; height: 56px;
+    background: var(--black);
+    border-radius: 50%;
+    border: 3px solid var(--black);
+    margin: 0 auto 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px;
+  }
+  .phone-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    letter-spacing: 0.05em;
+  }
+  .phone-bio {
+    font-size: 9px;
+    opacity: 0.7;
+    margin-top: 2px;
+  }
+  .phone-links { padding: 14px; display: flex; flex-direction: column; gap: 8px; }
+  .phone-link {
+    background: var(--black);
+    color: var(--white);
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 10px 12px;
+    border: 2px solid var(--black);
+    text-align: center;
+    box-shadow: 3px 3px 0 var(--yellow);
+  }
+  .phone-link:nth-child(2) { background: var(--white); color: var(--black); box-shadow: 3px 3px 0 var(--black); }
+  .phone-link:nth-child(3) { background: var(--red); box-shadow: 3px 3px 0 var(--black); }
+
+  /* STATS STRIP */
+  .stats-strip {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    border-top: var(--border-thick);
+  }
+  .stat-item {
+    padding: 36px 32px;
+    border-right: var(--border-thick);
+    position: relative;
+  }
+  .stat-item:last-child { border-right: none; }
+  .stat-number {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 72px;
+    line-height: 1;
+    color: var(--black);
+  }
+  .stat-number span { color: var(--red); }
+  .stat-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    opacity: 0.6;
+    margin-top: 4px;
+  }
+
+  /* FEATURES */
+  .section-header {
+    padding: 60px 40px 0;
+    display: flex;
+    align-items: baseline;
+    gap: 20px;
+  }
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 64px;
+    letter-spacing: 0.02em;
+  }
+  .section-num {
+    font-size: 12px;
+    opacity: 0.4;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    border-top: var(--border-thick);
+    margin-top: 40px;
+  }
+  .feature-card {
+    padding: 36px 32px;
+    border-right: var(--border-thick);
+    border-bottom: var(--border-thick);
+    position: relative;
+    transition: background 0.15s;
+  }
+  .feature-card:hover { background: var(--yellow); }
+  .feature-card:nth-child(3), .feature-card:nth-child(6) { border-right: none; }
+  .feature-icon {
+    font-size: 36px;
+    margin-bottom: 20px;
+    display: block;
+  }
+  .feature-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 0.03em;
+    margin-bottom: 12px;
+  }
+  .feature-desc { font-size: 13px; line-height: 1.7; opacity: 0.75; }
+
+  /* CTA SECTION */
+  .cta-section {
+    background: var(--black);
+    color: var(--white);
+    padding: 80px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 40px;
+    border-top: var(--border-thick);
+    flex-wrap: wrap;
+  }
+  .cta-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(48px, 7vw, 96px);
+    line-height: 0.95;
+  }
+  .cta-title em {
+    font-style: normal;
+    color: var(--yellow);
+    -webkit-text-stroke: 0;
+  }
+
+  /* FOOTER */
+  .footer {
+    padding: 28px 40px;
+    border-top: var(--border-thick);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
+    opacity: 0.6;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  /* ===================================================
+     PAGE 2 — LOGIN
+  =================================================== */
+  #page-login {
+    background: var(--black);
+    display: none;
+    min-height: 100vh;
+    position: relative;
+    overflow: hidden;
+  }
+  #page-login.active { display: flex; }
+
+  #page-login::before {
+    content: 'LOGIN\AMASUK\AENTER\AAKSES';
+    white-space: pre;
+    position: absolute;
+    right: -20px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 180px;
+    line-height: 1;
+    color: rgba(255,255,255,0.03);
+    pointer-events: none;
+    letter-spacing: 0.02em;
+  }
+
+  .login-container {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .login-left {
+    background: var(--yellow);
+    border-right: var(--border-thick);
+    padding: 60px 50px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .login-brand {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 48px;
+    color: var(--black);
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .login-brand span { color: var(--red); }
+  .login-tagline {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 42px;
+    line-height: 1.2;
+    color: var(--black);
+    margin-top: 40px;
+  }
+  .login-visual {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 0;
+  }
+  .big-arrow {
+    font-size: 180px;
+    line-height: 1;
+    font-family: 'Bebas Neue', sans-serif;
+    color: var(--black);
+    opacity: 0.15;
+    user-select: none;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:0.12} 50%{opacity:0.22} }
+  .login-footnote {
+    font-size: 11px;
+    opacity: 0.5;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--black);
+  }
+
+  .login-right {
+    padding: 60px 50px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .login-back {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--white);
+    opacity: 0.5;
+    cursor: pointer;
+    margin-bottom: 48px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: none;
+    border: none;
+    font-family: 'Space Mono', monospace;
+    transition: opacity 0.15s;
+  }
+  .login-back:hover { opacity: 1; }
+  .login-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 72px;
+    color: var(--white);
+    line-height: 0.95;
+    margin-bottom: 8px;
+  }
+  .login-sub {
+    font-size: 13px;
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 48px;
+  }
+  .form-group { margin-bottom: 24px; }
+  .form-group .input-label { color: rgba(255,255,255,0.6); }
+  .form-group .input {
+    background: rgba(255,255,255,0.06);
+    color: var(--white);
+    border-color: rgba(255,255,255,0.2);
+  }
+  .form-group .input:focus {
+    background: rgba(255,229,0,0.1);
+    border-color: var(--yellow);
+    box-shadow: 4px 4px 0 var(--yellow);
+    color: var(--white);
+  }
+  .form-group .input::placeholder { color: rgba(255,255,255,0.25); }
+  .login-toggle {
+    font-size: 12px;
+    color: rgba(255,255,255,0.45);
+    margin-top: 20px;
+    text-align: center;
+  }
+  .login-toggle a {
+    color: var(--yellow);
+    cursor: pointer;
+    text-decoration: none;
+    font-weight: 700;
+  }
+  .login-toggle a:hover { text-decoration: underline; }
+
+  /* ===================================================
+     PAGE 3 — DASHBOARD
+  =================================================== */
+  #page-dashboard {
+    background: var(--white);
+    display: none;
+    min-height: 100vh;
+  }
+  #page-dashboard.active { display: block; }
+
+  .dash-layout {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    min-height: 100vh;
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    background: var(--black);
+    border-right: var(--border-thick);
+    display: flex;
+    flex-direction: column;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+  }
+  .sidebar-logo {
+    padding: 28px 24px;
+    border-bottom: 3px solid rgba(255,255,255,0.12);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    color: var(--white);
+  }
+  .sidebar-logo span { color: var(--yellow); }
+  .sidebar-profile {
+    padding: 28px 24px;
+    border-bottom: 3px solid rgba(255,255,255,0.12);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .sidebar-avatar {
+    width: 48px; height: 48px;
+    background: var(--yellow);
+    border: 3px solid var(--yellow);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+  .sidebar-username {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    color: var(--white);
+    letter-spacing: 0.05em;
+  }
+  .sidebar-url {
+    font-size: 10px;
+    color: var(--yellow);
+    opacity: 0.8;
+    letter-spacing: 0.05em;
+  }
+  .sidebar-nav { flex: 1; padding: 20px 0; }
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 24px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: rgba(255,255,255,0.5);
+    cursor: pointer;
+    border-left: 4px solid transparent;
+    transition: all 0.12s;
+    border: none;
+    background: none;
+    width: 100%;
+    font-family: 'Space Mono', monospace;
+    text-align: left;
+  }
+  .nav-item:hover { color: var(--white); background: rgba(255,255,255,0.05); }
+  .nav-item.active { color: var(--yellow); border-left: 4px solid var(--yellow); background: rgba(255,229,0,0.06); }
+  .nav-item .nav-icon { font-size: 16px; width: 20px; text-align: center; }
+  .sidebar-bottom {
+    padding: 24px;
+    border-top: 3px solid rgba(255,255,255,0.12);
+  }
+
+  /* MAIN CONTENT */
+  .dash-main { overflow-y: auto; }
+  .dash-topbar {
+    padding: 20px 36px;
+    border-bottom: var(--border-thick);
+    background: var(--white);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+  .dash-page-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 32px;
+    letter-spacing: 0.04em;
+  }
+  .dash-content { padding: 36px; }
+
+  /* CARDS */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    border: var(--border-thick);
+    margin-bottom: 32px;
+    box-shadow: var(--shadow-lg);
+  }
+  .stat-card {
+    padding: 28px 24px;
+    border-right: var(--border-thick);
+    position: relative;
+    overflow: hidden;
+    transition: background 0.15s;
+  }
+  .stat-card:last-child { border-right: none; }
+  .stat-card:hover { background: var(--yellow); }
+  .stat-card-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 56px;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .stat-card-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    opacity: 0.55;
+  }
+  .stat-card-delta {
+    position: absolute;
+    top: 16px; right: 16px;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border: 2px solid var(--black);
+    background: var(--black);
+    color: var(--yellow);
+  }
+
+  /* LINKS SECTION */
+  .section-card {
+    border: var(--border-thick);
+    box-shadow: var(--shadow-lg);
+    margin-bottom: 28px;
+    overflow: hidden;
+  }
+  .section-card-header {
+    background: var(--black);
+    color: var(--white);
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .section-card-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 0.06em;
+  }
+  .section-card-body { padding: 0; }
+
+  .link-item {
+    display: grid;
+    grid-template-columns: 40px 1fr auto auto;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 24px;
+    border-bottom: 2px solid var(--black);
+    transition: background 0.1s;
+  }
+  .link-item:last-child { border-bottom: none; }
+  .link-item:hover { background: #f5f0e820; }
+  .drag-handle {
+    color: rgba(0,0,0,0.25);
+    cursor: grab;
+    font-size: 18px;
+    text-align: center;
+    user-select: none;
+  }
+  .link-info {}
+  .link-title-text {
+    font-weight: 700;
+    font-size: 13px;
+    margin-bottom: 3px;
+  }
+  .link-url-text {
+    font-size: 11px;
+    opacity: 0.45;
+    font-style: italic;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 300px;
+  }
+  .link-toggle {
+    width: 44px; height: 24px;
+    background: var(--black);
+    border: 2px solid var(--black);
+    border-radius: 0;
+    position: relative;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 0.15s;
+  }
+  .link-toggle.on { background: var(--yellow); }
+  .link-toggle::after {
+    content: '';
+    position: absolute;
+    width: 16px; height: 16px;
+    background: var(--white);
+    top: 2px; left: 2px;
+    transition: transform 0.15s;
+    border: 1px solid var(--black);
+  }
+  .link-toggle.on::after { transform: translateX(20px); background: var(--black); }
+  .link-actions { display: flex; gap: 6px; }
+  .link-btn {
+    padding: 6px 10px;
+    font-size: 11px;
+    font-family: 'Space Mono', monospace;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border: 2px solid var(--black);
+    background: var(--white);
+    cursor: pointer;
+    transition: background 0.1s, transform 0.08s;
+    box-shadow: 2px 2px 0 var(--black);
+  }
+  .link-btn:hover { background: var(--yellow); transform: translate(-1px,-1px); box-shadow: 3px 3px 0 var(--black); }
+  .link-btn.del:hover { background: var(--red); color: var(--white); }
+
+  /* ADD LINK FORM */
+  .add-link-row {
+    padding: 20px 24px;
+    background: rgba(255,229,0,0.08);
+    border-top: var(--border-thick);
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 12px;
+    align-items: end;
+  }
+  .add-link-row .input { border-width: 2px; }
+
+  /* PROFILE SECTION */
+  .profile-grid {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 0;
+  }
+  .profile-avatar-section {
+    padding: 28px;
+    border-right: var(--border-thick);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+  .profile-avatar-big {
+    width: 100px; height: 100px;
+    background: var(--yellow);
+    border: var(--border-thick);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 44px;
+    box-shadow: var(--shadow);
+  }
+  .profile-fields { padding: 28px; display: flex; flex-direction: column; gap: 20px; }
+
+  /* THEME PICKER */
+  .theme-options {
+    display: flex; gap: 12px; flex-wrap: wrap; margin-top: 8px;
+  }
+  .theme-dot {
+    width: 36px; height: 36px;
+    border: 3px solid transparent;
+    cursor: pointer;
+    transition: transform 0.1s, border-color 0.1s;
+    box-shadow: 3px 3px 0 var(--black);
+  }
+  .theme-dot:hover { transform: translate(-2px,-2px); box-shadow: 5px 5px 0 var(--black); }
+  .theme-dot.selected { border-color: var(--black); }
+
+  /* PORTFOLIO */
+  .portfolio-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+  }
+  .portfolio-card {
+    aspect-ratio: 1;
+    border-right: var(--border-thick);
+    border-bottom: var(--border-thick);
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    background: var(--black);
+  }
+  .portfolio-card:nth-child(3n) { border-right: none; }
+  .portfolio-card-bg {
+    width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 56px;
+    transition: transform 0.2s;
+  }
+  .portfolio-card:hover .portfolio-card-bg { transform: scale(1.05); }
+  .portfolio-overlay {
+    position: absolute;
+    inset: 0;
+    background: var(--yellow);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.15s;
+    border: none;
+    padding: 16px;
+    text-align: center;
+  }
+  .portfolio-card:hover .portfolio-overlay { opacity: 1; }
+  .portfolio-overlay-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    color: var(--black);
+  }
+  .portfolio-add-card {
+    aspect-ratio: 1;
+    border-right: none;
+    border-bottom: var(--border-thick);
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column;
+    gap: 10px;
+    cursor: pointer;
+    transition: background 0.15s;
+    border: var(--border-thick);
+    background: none;
+    width: 100%;
+    font-family: 'Space Mono', monospace;
+  }
+  .portfolio-add-card:hover { background: var(--yellow); }
+  .portfolio-add-icon { font-size: 32px; }
+  .portfolio-add-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; }
+
+  /* TABS */
+  .dash-tabs {
+    display: flex;
+    border-bottom: var(--border-thick);
+    margin-bottom: 28px;
+    overflow-x: auto;
+  }
+  .dash-tab {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    padding: 14px 24px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    border-right: var(--border-thick);
+    border-bottom: 4px solid transparent;
+    color: rgba(0,0,0,0.45);
+    transition: all 0.1s;
+    white-space: nowrap;
+  }
+  .dash-tab:hover { background: rgba(0,0,0,0.04); color: var(--black); }
+  .dash-tab.active { color: var(--black); border-bottom: 4px solid var(--black); background: var(--yellow); }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* ALERT */
+  .alert {
+    padding: 14px 20px;
+    border: var(--border-thick);
+    font-size: 12px;
+    letter-spacing: 0.05em;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow);
+  }
+  .alert-success { background: var(--yellow); }
+  .alert-info { background: var(--blue); color: var(--white); }
+
+  /* COPY URL BOX */
+  .url-box {
+    display: flex;
+    border: var(--border-thick);
+    box-shadow: var(--shadow);
+    margin-bottom: 28px;
+    overflow: hidden;
+  }
+  .url-display {
+    flex: 1;
+    padding: 14px 18px;
+    font-size: 13px;
+    background: rgba(0,51,255,0.05);
+    border-right: var(--border-thick);
+    font-style: italic;
+    display: flex;
+    align-items: center;
+  }
+  .url-display strong { color: var(--blue); margin-right: 2px; }
+
+  /* NOTIFICATION DOT */
+  .notif-dot {
+    width: 8px; height: 8px;
+    background: var(--red);
+    border-radius: 50%;
+    border: 2px solid var(--black);
+    display: inline-block;
+    vertical-align: middle;
+  }
+
+  /* ===== ANIMATIONS ===== */
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .page.active .hero-left,
+  .page.active .section-card,
+  .page.active .stats-row {
+    animation: slideIn 0.3s ease forwards;
+  }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 900px) {
+    .hero { grid-template-columns: 1fr; }
+    .hero-right { display: none; }
+    .stats-strip, .features-grid { grid-template-columns: 1fr; }
+    .stat-item, .feature-card { border-right: none; }
+    .login-container { grid-template-columns: 1fr; }
+    .login-left { display: none; }
+    .dash-layout { grid-template-columns: 1fr; }
+    .sidebar { position: fixed; transform: translateX(-100%); z-index: 200; width: 260px; height: 100vh; }
+    .stats-row { grid-template-columns: 1fr 1fr; }
+    .stats-row .stat-card:nth-child(2) { border-right: none; }
+    .stats-row .stat-card:nth-child(3) { border-top: var(--border-thick); }
+    .nav { padding: 16px 20px; }
+    .hero-left { padding: 40px 20px; }
+    .section-header { padding: 40px 20px 0; }
+    .features-grid { margin: 20px 0 0; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===================================================
+     PAGE 1 — LANDING
+=================================================== -->
+<div id="page-landing" class="page active">
+
+  <nav class="nav">
+    <a class="nav-logo" href="#">LINK<span>BRUT</span></a>
+    <div class="nav-links">
+      <button class="btn btn-white" onclick="showPage('login','right')">MASUK</button>
+      <button class="btn" onclick="showPage('login','right')">DAFTAR GRATIS →</button>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-left">
+      <div class="hero-badge">⚡ Link-in-Bio Platform #1</div>
+      <h1 class="hero-title">
+        SATU<br>
+        <span class="outline">LINK.</span><br>
+        <span class="fill-yellow">SEMUA</span><br>
+        KAMU.
+      </h1>
+      <p class="hero-desc">
+        Buat halaman profil yang brutal, jujur, dan benar-benar milikmu. Tanpa template membosankan. Tanpa batasan. Langsung di-deploy ke hosting kamu.
+      </p>
+      <div class="hero-actions">
+        <button class="btn" onclick="showPage('login','right')">MULAI SEKARANG →</button>
+        <button class="btn btn-black" onclick="showPage('dashboard','right')">LIHAT DEMO</button>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="phone-mockup">
+        <div class="phone-header">
+          <div class="phone-avatar">🔥</div>
+          <div class="phone-name">@dhabyap</div>
+          <div class="phone-bio">designer · developer · creator</div>
+        </div>
+        <div class="phone-links">
+          <div class="phone-link">🚀 Portfolio Saya</div>
+          <div class="phone-link">📸 Instagram</div>
+          <div class="phone-link">💼 Hire Me!</div>
+          <div class="phone-link" style="background:var(--yellow);color:var(--black);box-shadow:3px 3px 0 var(--black);">🎨 Karya Terbaru</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="marquee-wrap">
+    <div class="marquee-track">
+      <span>LINK-IN-BIO</span><span>●</span>
+      <span>MINI PORTFOLIO</span><span>●</span>
+      <span>CUSTOM URL</span><span>●</span>
+      <span>CEPAT & RINGAN</span><span>●</span>
+      <span>SHARED HOSTING READY</span><span>●</span>
+      <span>BRUTALIST DESIGN</span><span>●</span>
+      <span>LINK-IN-BIO</span><span>●</span>
+      <span>MINI PORTFOLIO</span><span>●</span>
+      <span>CUSTOM URL</span><span>●</span>
+      <span>CEPAT & RINGAN</span><span>●</span>
+      <span>SHARED HOSTING READY</span><span>●</span>
+      <span>BRUTALIST DESIGN</span><span>●</span>
+    </div>
+  </div>
+
+  <div class="stats-strip">
+    <div class="stat-item">
+      <div class="stat-number">12<span>K+</span></div>
+      <div class="stat-label">Pengguna Aktif</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">4<span>M+</span></div>
+      <div class="stat-label">Klik per Bulan</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">99<span>%</span></div>
+      <div class="stat-label">Uptime SLA</div>
+    </div>
+  </div>
+
+  <div class="section-header">
+    <h2 class="section-title">FITUR</h2>
+    <span class="section-num">— 06 FITUR UTAMA</span>
+  </div>
+
+  <div class="features-grid">
+    <div class="feature-card">
+      <span class="feature-icon">🔗</span>
+      <div class="feature-title">Custom URL</div>
+      <p class="feature-desc">Setiap akun punya URL unik: <strong>domain.com/username</strong>. Singkat, personal, dan mudah dibagikan ke mana saja.</p>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">🎨</span>
+      <div class="feature-title">Tema Dinamis</div>
+      <p class="feature-desc">Pilih warna tema yang mencerminkan kepribadianmu. Tidak ada dua halaman yang terlihat sama.</p>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">🖼️</span>
+      <div class="feature-title">Mini Portfolio</div>
+      <p class="feature-desc">Tampilkan karya terbaikmu dengan tampilan glassmorphism yang memukau. Bukan sekedar galeri biasa.</p>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">⚡</span>
+      <div class="feature-title">Ultra Cepat</div>
+      <p class="feature-desc">Server-side caching membuat halamanmu dimuat dalam milidetik. Pengunjung tidak akan kabur karena loading lama.</p>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">📱</span>
+      <div class="feature-title">Mobile First</div>
+      <p class="feature-desc">Didesain dari layar kecil ke besar. Semua terlihat sempurna di mana saja dan kapan saja.</p>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">🔒</span>
+      <div class="feature-title">Aman & Terenkripsi</div>
+      <p class="feature-desc">Authentication solid dengan deployment token terenkripsi. Akunmu aman dari tangan yang tidak berwenang.</p>
+    </div>
+  </div>
+
+  <div class="cta-section">
+    <div>
+      <div class="cta-title">SIAP<br>BUAT<br><em>LINKMU?</em></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px;align-items:flex-start">
+      <p style="color:rgba(255,255,255,0.6);font-size:14px;max-width:400px;line-height:1.7;">Bergabung dengan ribuan creator, freelancer, dan profesional yang sudah pakai LINKBRUT.</p>
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        <button class="btn" onclick="showPage('login','right')">DAFTAR GRATIS →</button>
+        <button class="btn btn-white" onclick="showPage('dashboard','right')">LIHAT DEMO</button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <span>© 2025 LINKBRUT — Dibuat dengan ☕ dan keberanian</span>
+    <span>MIT License · Open Source</span>
+  </footer>
+
+</div>
+
+<!-- ===================================================
+     PAGE 2 — LOGIN/REGISTER
+=================================================== -->
+<div id="page-login" class="page">
+  <div class="login-container">
+    <div class="login-left">
+      <div>
+        <a class="login-brand" onclick="showPage('landing','left')" style="cursor:pointer">LINK<span>BRUT</span></a>
+        <p class="login-tagline">Satu link<br>untuk semua<br><em>hal tentang kamu.</em></p>
+      </div>
+      <div class="login-visual">
+        <div class="big-arrow">→</div>
+      </div>
+      <p class="login-footnote">Platform link-in-bio untuk creator Indonesia</p>
+    </div>
+    <div class="login-right">
+      <button class="login-back" onclick="showPage('landing','left')">← Kembali ke Home</button>
+
+      <!-- LOGIN FORM -->
+      <div id="form-login">
+        <h1 class="login-title">MASUK<br>AKUN</h1>
+        <p class="login-sub">Belum punya akun? <a onclick="toggleForm('register')">Daftar sekarang →</a></p>
+        <div class="form-group">
+          <label class="input-label">Email</label>
+          <input type="email" class="input" placeholder="kamu@email.com">
+        </div>
+        <div class="form-group">
+          <label class="input-label">Password</label>
+          <input type="password" class="input" placeholder="••••••••">
+        </div>
+        <button class="btn" style="width:100%;justify-content:center;display:flex;margin-bottom:8px;" onclick="showPage('dashboard','right')">
+          MASUK →
+        </button>
+        <p class="login-toggle"><a onclick="toggleForm('forgot')" style="opacity:0.5;font-size:11px;color:rgba(255,255,255,0.4)">Lupa password?</a></p>
+      </div>
+
+      <!-- REGISTER FORM -->
+      <div id="form-register" style="display:none">
+        <h1 class="login-title">BUAT<br>AKUN</h1>
+        <p class="login-sub">Sudah punya akun? <a onclick="toggleForm('login')">Masuk →</a></p>
+        <div class="form-group">
+          <label class="input-label">Username</label>
+          <input type="text" class="input" placeholder="namakamu">
+        </div>
+        <div class="form-group">
+          <label class="input-label">Email</label>
+          <input type="email" class="input" placeholder="kamu@email.com">
+        </div>
+        <div class="form-group">
+          <label class="input-label">Password</label>
+          <input type="password" class="input" placeholder="Min. 8 karakter">
+        </div>
+        <button class="btn" style="width:100%;justify-content:center;display:flex;" onclick="showPage('dashboard','right')">
+          DAFTAR GRATIS →
+        </button>
+      </div>
+
+      <!-- FORGOT FORM -->
+      <div id="form-forgot" style="display:none">
+        <h1 class="login-title">RESET<br>PASS</h1>
+        <p class="login-sub">Ingat password? <a onclick="toggleForm('login')">Masuk →</a></p>
+        <div class="form-group">
+          <label class="input-label">Email</label>
+          <input type="email" class="input" placeholder="kamu@email.com">
+        </div>
+        <button class="btn" style="width:100%;justify-content:center;display:flex;margin-bottom:16px;">
+          KIRIM RESET LINK →
+        </button>
+        <div class="alert alert-info" style="font-size:11px">
+          📬 Cek inbox emailmu setelah klik tombol di atas
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ===================================================
+     PAGE 3 — DASHBOARD
+=================================================== -->
+<div id="page-dashboard" class="page">
+  <div class="dash-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">LINK<span>BRUT</span></div>
+      <div class="sidebar-profile">
+        <div class="sidebar-avatar">🔥</div>
+        <div>
+          <div class="sidebar-username">@dhabyap</div>
+          <div class="sidebar-url">linkbrut.id/dhabyap</div>
+        </div>
+      </div>
+      <nav class="sidebar-nav">
+        <button class="nav-item active" onclick="switchTab('links',this)">
+          <span class="nav-icon">🔗</span> Links
+        </button>
+        <button class="nav-item" onclick="switchTab('profil',this)">
+          <span class="nav-icon">👤</span> Profil
+        </button>
+        <button class="nav-item" onclick="switchTab('portfolio',this)">
+          <span class="nav-icon">🖼️</span> Portfolio
+        </button>
+        <button class="nav-item" onclick="switchTab('analitik',this)">
+          <span class="nav-icon">📊</span> Analitik
+        </button>
+        <button class="nav-item" onclick="switchTab('pengaturan',this)">
+          <span class="nav-icon">⚙️</span> Pengaturan
+        </button>
+      </nav>
+      <div class="sidebar-bottom">
+        <button class="btn btn-white" style="width:100%;text-align:center;box-shadow:none;font-size:11px;" onclick="showPage('landing','left')">
+          ← Keluar
+        </button>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="dash-main">
+      <div class="dash-topbar">
+        <div class="dash-page-title" id="dash-title">KELOLA LINKS</div>
+        <div style="display:flex;gap:10px;align-items:center">
+          <button class="btn btn-black" style="font-size:11px;padding:10px 18px;" onclick="window.open('#','_blank')">LIHAT PROFIL ↗</button>
+        </div>
+      </div>
+
+      <div class="dash-content">
+        <!-- URL BOX -->
+        <div class="url-box">
+          <div class="url-display"><strong>linkbrut.id/</strong>dhabyap</div>
+          <button class="btn" style="box-shadow:none;border-left:none;" onclick="copyUrl()">SALIN</button>
+        </div>
+
+        <!-- STATS ROW -->
+        <div class="stats-row">
+          <div class="stat-card">
+            <div class="stat-card-delta">+12%</div>
+            <div class="stat-card-num">1.4K</div>
+            <div class="stat-card-label">Klik Bulan Ini</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-delta">+3%</div>
+            <div class="stat-card-num">6</div>
+            <div class="stat-card-label">Links Aktif</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-delta">+8%</div>
+            <div class="stat-card-num">89%</div>
+            <div class="stat-card-label">Mobile Views</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-delta">NEW</div>
+            <div class="stat-card-num">3</div>
+            <div class="stat-card-label">Portfolio Item</div>
+          </div>
+        </div>
+
+        <!-- TAB CONTENTS -->
+
+        <!-- LINKS TAB -->
+        <div class="tab-content active" id="tab-links">
+          <div class="section-card">
+            <div class="section-card-header">
+              <div class="section-card-title">SEMUA LINK — 6 TOTAL</div>
+              <span style="font-size:11px;opacity:0.6;letter-spacing:0.1em;">DRAG UNTUK URUT</span>
+            </div>
+            <div class="section-card-body" id="links-list">
+              <!-- Links injected by JS -->
+            </div>
+            <div class="add-link-row">
+              <div>
+                <label class="input-label" style="font-size:10px;margin-bottom:6px;">JUDUL LINK</label>
+                <input type="text" class="input" placeholder="Contoh: Portfolio Design" id="new-title">
+              </div>
+              <div>
+                <label class="input-label" style="font-size:10px;margin-bottom:6px;">URL</label>
+                <input type="text" class="input" placeholder="https://..." id="new-url">
+              </div>
+              <button class="btn" style="height:50px;white-space:nowrap;" onclick="addLink()">+ TAMBAH</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- PROFIL TAB -->
+        <div class="tab-content" id="tab-profil">
+          <div class="section-card">
+            <div class="section-card-header">
+              <div class="section-card-title">PROFIL KAMU</div>
+            </div>
+            <div class="section-card-body">
+              <div class="profile-grid">
+                <div class="profile-avatar-section">
+                  <div class="profile-avatar-big">🔥</div>
+                  <button class="btn btn-black" style="font-size:10px;padding:8px 14px;box-shadow:3px 3px 0 rgba(0,0,0,0.3);">UPLOAD FOTO</button>
+                  <p style="font-size:10px;opacity:0.4;text-align:center;line-height:1.5">JPG/PNG<br>max 2MB</p>
+                </div>
+                <div class="profile-fields">
+                  <div>
+                    <label class="input-label">Nama Tampilan</label>
+                    <input type="text" class="input" value="Dhaby Ap" style="border-width:2px">
+                  </div>
+                  <div>
+                    <label class="input-label">Username</label>
+                    <input type="text" class="input" value="dhabyap" style="border-width:2px">
+                  </div>
+                  <div>
+                    <label class="input-label">Bio</label>
+                    <textarea class="input" rows="3" style="resize:vertical;border-width:2px">designer · developer · builder of things ⚡</textarea>
+                  </div>
+                  <div>
+                    <label class="input-label">Warna Tema</label>
+                    <div class="theme-options">
+                      <div class="theme-dot selected" style="background:#FFE500" onclick="selectTheme(this)"></div>
+                      <div class="theme-dot" style="background:#FF2B2B" onclick="selectTheme(this)"></div>
+                      <div class="theme-dot" style="background:#0033FF" onclick="selectTheme(this)"></div>
+                      <div class="theme-dot" style="background:#00C896" onclick="selectTheme(this)"></div>
+                      <div class="theme-dot" style="background:#FF6B00" onclick="selectTheme(this)"></div>
+                      <div class="theme-dot" style="background:#9B00FF" onclick="selectTheme(this)"></div>
+                      <div class="theme-dot" style="background:#0a0a0a" onclick="selectTheme(this)"></div>
+                    </div>
+                  </div>
+                  <button class="btn" style="width:fit-content">SIMPAN PERUBAHAN →</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PORTFOLIO TAB -->
+        <div class="tab-content" id="tab-portfolio">
+          <div class="section-card">
+            <div class="section-card-header">
+              <div class="section-card-title">MINI PORTFOLIO</div>
+              <span style="font-size:11px;opacity:0.6">3/9 SLOT TERISI</span>
+            </div>
+            <div class="section-card-body">
+              <div class="portfolio-grid">
+                <div class="portfolio-card" style="background:#1a1a2e">
+                  <div class="portfolio-card-bg">🎨</div>
+                  <div class="portfolio-overlay">
+                    <div class="portfolio-overlay-title">BRAND DESIGN</div>
+                    <div style="font-size:10px;margin-top:4px;opacity:0.7">Branding Project 2024</div>
+                    <div style="display:flex;gap:6px;margin-top:12px">
+                      <button class="btn btn-black" style="font-size:9px;padding:5px 10px;box-shadow:none">EDIT</button>
+                      <button class="btn btn-red" style="font-size:9px;padding:5px 10px;box-shadow:none;color:white">HAPUS</button>
+                    </div>
+                  </div>
+                </div>
+                <div class="portfolio-card" style="background:#0d1b2a">
+                  <div class="portfolio-card-bg">💻</div>
+                  <div class="portfolio-overlay">
+                    <div class="portfolio-overlay-title">WEB APP</div>
+                    <div style="font-size:10px;margin-top:4px;opacity:0.7">Laravel + Tailwind</div>
+                    <div style="display:flex;gap:6px;margin-top:12px">
+                      <button class="btn btn-black" style="font-size:9px;padding:5px 10px;box-shadow:none">EDIT</button>
+                      <button class="btn btn-red" style="font-size:9px;padding:5px 10px;box-shadow:none;color:white">HAPUS</button>
+                    </div>
+                  </div>
+                </div>
+                <div class="portfolio-card" style="background:#2d1b00">
+                  <div class="portfolio-card-bg">📱</div>
+                  <div class="portfolio-overlay">
+                    <div class="portfolio-overlay-title">UI/UX DESIGN</div>
+                    <div style="font-size:10px;margin-top:4px;opacity:0.7">Mobile App Design</div>
+                    <div style="display:flex;gap:6px;margin-top:12px">
+                      <button class="btn btn-black" style="font-size:9px;padding:5px 10px;box-shadow:none">EDIT</button>
+                      <button class="btn btn-red" style="font-size:9px;padding:5px 10px;box-shadow:none;color:white">HAPUS</button>
+                    </div>
+                  </div>
+                </div>
+                <button class="portfolio-add-card" onclick="alert('Upload karya baru')">
+                  <div class="portfolio-add-icon">＋</div>
+                  <div class="portfolio-add-label">Tambah Karya</div>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ANALITIK TAB -->
+        <div class="tab-content" id="tab-analitik">
+          <div class="section-card">
+            <div class="section-card-header">
+              <div class="section-card-title">ANALITIK — 30 HARI TERAKHIR</div>
+            </div>
+            <div class="section-card-body" style="padding:28px">
+              <!-- Fake bar chart -->
+              <div style="margin-bottom:28px">
+                <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:16px;opacity:0.6">KLIK PER HARI</div>
+                <div style="display:flex;align-items:flex-end;gap:4px;height:100px;border-bottom:3px solid var(--black);padding-bottom:8px">
+                  ${[22,45,30,60,80,40,55,90,70,65,48,72,88,95,60,44,38,76,82,91,55,67,43,78,85,92,61,70,88,100].map((v,i)=>`
+                  <div style="flex:1;background:${i===29?'var(--red)':'var(--black)'};height:${v}%;opacity:${i===29?1:0.15+(i*0.025)};transition:opacity 0.15s;cursor:pointer;position:relative" title="${v} klik"></div>`).join('')}
+                </div>
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:var(--border-thick)">
+                <div style="padding:20px;border-right:var(--border-thick)">
+                  <div style="font-family:'Bebas Neue',sans-serif;font-size:40px">1.4K</div>
+                  <div style="font-size:10px;opacity:0.5;text-transform:uppercase;letter-spacing:0.1em">Total Klik</div>
+                </div>
+                <div style="padding:20px;border-right:var(--border-thick)">
+                  <div style="font-family:'Bebas Neue',sans-serif;font-size:40px">47</div>
+                  <div style="font-size:10px;opacity:0.5;text-transform:uppercase;letter-spacing:0.1em">Rata-rata/Hari</div>
+                </div>
+                <div style="padding:20px">
+                  <div style="font-family:'Bebas Neue',sans-serif;font-size:40px;color:var(--red)">+12%</div>
+                  <div style="font-size:10px;opacity:0.5;text-transform:uppercase;letter-spacing:0.1em">vs Bulan Lalu</div>
+                </div>
+              </div>
+              <div style="margin-top:28px">
+                <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:16px;opacity:0.6">LINK TERPOPULER</div>
+                ${[
+                  {name:'🚀 Portfolio Saya', clicks:542, pct:78},
+                  {name:'📸 Instagram', clicks:328, pct:47},
+                  {name:'💼 Hire Me!', clicks:289, pct:41},
+                  {name:'🎨 Karya Terbaru', clicks:201, pct:29},
+                ].map((l,i)=>`
+                <div style="display:grid;grid-template-columns:200px 1fr 60px;align-items:center;gap:16px;padding:12px 0;border-bottom:2px solid rgba(0,0,0,0.08)">
+                  <div style="font-size:12px;font-weight:700">${l.name}</div>
+                  <div style="background:rgba(0,0,0,0.08);height:8px;border:1px solid rgba(0,0,0,0.15)"><div style="height:100%;background:var(--black);width:${l.pct}%"></div></div>
+                  <div style="font-size:12px;font-weight:700;text-align:right">${l.clicks}</div>
+                </div>`).join('')}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PENGATURAN TAB -->
+        <div class="tab-content" id="tab-pengaturan">
+          <div class="section-card" style="margin-bottom:20px">
+            <div class="section-card-header">
+              <div class="section-card-title">PENGATURAN AKUN</div>
+            </div>
+            <div class="section-card-body" style="padding:28px;display:flex;flex-direction:column;gap:20px">
+              <div>
+                <label class="input-label">Email</label>
+                <input type="email" class="input" value="dhaby@email.com" style="border-width:2px">
+              </div>
+              <div>
+                <label class="input-label">Password Baru</label>
+                <input type="password" class="input" placeholder="Kosongkan jika tidak ingin ganti" style="border-width:2px">
+              </div>
+              <button class="btn" style="width:fit-content">SIMPAN →</button>
+            </div>
+          </div>
+          <div class="section-card">
+            <div class="section-card-header" style="background:var(--red)">
+              <div class="section-card-title">DEPLOYMENT TOKEN</div>
+            </div>
+            <div class="section-card-body" style="padding:28px">
+              <div class="alert alert-info" style="margin-bottom:16px">
+                ⚠️ Token ini digunakan untuk deploy via browser tanpa SSH. Jangan bagikan ke siapapun!
+              </div>
+              <div style="display:flex;gap:10px;align-items:center">
+                <input type="password" class="input" value="sk_prod_••••••••••••••••••••••••" style="border-width:2px;flex:1" id="token-input">
+                <button class="btn btn-black" style="height:50px;white-space:nowrap" onclick="toggleToken()">TAMPILKAN</button>
+                <button class="btn btn-red" style="height:50px;white-space:nowrap;color:white">RESET TOKEN</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /dash-content -->
+    </main>
+  </div>
+</div>
+
+<script>
+// ===== PAGE NAVIGATION =====
+function showPage(name, dir) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const page = document.getElementById('page-' + name);
+  page.classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+// ===== LOGIN FORM TOGGLE =====
+function toggleForm(which) {
+  document.getElementById('form-login').style.display = 'none';
+  document.getElementById('form-register').style.display = 'none';
+  document.getElementById('form-forgot').style.display = 'none';
+  document.getElementById('form-' + which).style.display = 'block';
+}
+
+// ===== DASHBOARD TABS =====
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  btn.classList.add('active');
+  const titles = {
+    links: 'KELOLA LINKS',
+    profil: 'PROFIL KAMU',
+    portfolio: 'MINI PORTFOLIO',
+    analitik: 'ANALITIK',
+    pengaturan: 'PENGATURAN'
+  };
+  document.getElementById('dash-title').textContent = titles[name];
+}
+
+// ===== LINKS DATA =====
+let links = [
+  { id: 1, title: '🚀 Portfolio Saya', url: 'https://dhabyap.dev', on: true },
+  { id: 2, title: '📸 Instagram', url: 'https://instagram.com/dhabyap', on: true },
+  { id: 3, title: '💼 Hire Me!', url: 'https://dhabyap.dev/hire', on: true },
+  { id: 4, title: '🎨 Karya Terbaru', url: 'https://dhabyap.dev/work', on: true },
+  { id: 5, title: '🐦 Twitter / X', url: 'https://x.com/dhabyap', on: false },
+  { id: 6, title: '📧 Email Saya', url: 'mailto:dhaby@email.com', on: true },
+];
+let nextId = 7;
+
+function renderLinks() {
+  const list = document.getElementById('links-list');
+  list.innerHTML = links.map(l => `
+    <div class="link-item" data-id="${l.id}">
+      <div class="drag-handle">⠿</div>
+      <div class="link-info">
+        <div class="link-title-text">${l.title}</div>
+        <div class="link-url-text">${l.url}</div>
+      </div>
+      <div class="link-toggle ${l.on ? 'on' : ''}" onclick="toggleLink(${l.id})"></div>
+      <div class="link-actions">
+        <button class="link-btn" onclick="editLink(${l.id})">EDIT</button>
+        <button class="link-btn del" onclick="deleteLink(${l.id})">✕</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function toggleLink(id) {
+  const l = links.find(x => x.id === id);
+  if (l) l.on = !l.on;
+  renderLinks();
+}
+
+function deleteLink(id) {
+  links = links.filter(x => x.id !== id);
+  renderLinks();
+  updateLinkCount();
+}
+
+function editLink(id) {
+  const l = links.find(x => x.id === id);
+  if (!l) return;
+  const newTitle = prompt('Judul Link:', l.title);
+  if (newTitle !== null) l.title = newTitle || l.title;
+  const newUrl = prompt('URL:', l.url);
+  if (newUrl !== null) l.url = newUrl || l.url;
+  renderLinks();
+}
+
+function addLink() {
+  const title = document.getElementById('new-title').value.trim();
+  const url = document.getElementById('new-url').value.trim();
+  if (!title || !url) { alert('Isi judul dan URL dulu!'); return; }
+  links.push({ id: nextId++, title, url, on: true });
+  document.getElementById('new-title').value = '';
+  document.getElementById('new-url').value = '';
+  renderLinks();
+  updateLinkCount();
+}
+
+function updateLinkCount() {
+  const header = document.querySelector('#tab-links .section-card-header .section-card-title');
+  if (header) header.textContent = `SEMUA LINK — ${links.length} TOTAL`;
+}
+
+// ===== COPY URL =====
+function copyUrl() {
+  navigator.clipboard.writeText('https://linkbrut.id/dhabyap').catch(() => {});
+  const btn = event.target;
+  btn.textContent = 'TERSALIN ✓';
+  btn.style.background = '#00C896';
+  setTimeout(() => { btn.textContent = 'SALIN'; btn.style.background = ''; }, 1500);
+}
+
+// ===== THEME SELECT =====
+function selectTheme(el) {
+  document.querySelectorAll('.theme-dot').forEach(d => d.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+// ===== TOKEN TOGGLE =====
+function toggleToken() {
+  const inp = document.getElementById('token-input');
+  const btn = event.target;
+  if (inp.type === 'password') {
+    inp.type = 'text';
+    inp.value = 'sk_prod_f8a3b2c1d4e5f6a7b8c9d0e1f2a3b4c5';
+    btn.textContent = 'SEMBUNYIKAN';
+  } else {
+    inp.type = 'password';
+    inp.value = 'sk_prod_••••••••••••••••••••••••';
+    btn.textContent = 'TAMPILKAN';
+  }
+}
+
+// ===== INIT =====
+renderLinks();
+</script>
+</body>
+</html>
