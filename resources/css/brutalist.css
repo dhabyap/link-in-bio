@@ -813,3 +813,63 @@ body::before {
   font-size: 40px;
 }
 .profile-info-section { padding: 36px; }
+
+/* Dashboard Responsive */
+@media (max-width: 1024px) {
+  .dash-layout {
+    grid-template-columns: 1fr;
+  }
+  .sidebar {
+    position: fixed;
+    left: -260px;
+    z-index: 1000;
+    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .sidebar.open {
+    left: 0;
+  }
+  .dash-topbar {
+    padding: 16px 20px;
+  }
+  .dash-content {
+    padding: 20px;
+  }
+  .stats-row {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .stats-row {
+    grid-template-columns: 1fr;
+  }
+  .stat-card {
+    border-right: none;
+    border-bottom: var(--border-thick);
+  }
+  .stat-card:last-child {
+    border-bottom: none;
+  }
+}
+
+/* Mobile Toggle */
+.menu-toggle {
+    display: none;
+    background: var(--black);
+    color: var(--white);
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-family: 'Space Mono', monospace;
+    font-weight: 700;
+    font-size: 14px;
+    border: 3px solid var(--black);
+    box-shadow: 4px 4px 0 var(--yellow);
+    margin-right: 15px;
+}
+
+@media (max-width: 1024px) {
+    .menu-toggle {
+        display: inline-block;
+    }
+}

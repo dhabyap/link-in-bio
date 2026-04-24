@@ -1,17 +1,34 @@
-<x-app-layout>
+<x-dashboard-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Dashboard') }}
-        </h2>
+        DASHBOARD
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
-                    {{ __("You're logged in!") }}
-                </div>
-            </div>
+    <div class="stats-row">
+        <div class="stat-card">
+            <div class="stat-card-delta">+12%</div>
+            <div class="stat-card-num">1.2K</div>
+            <div class="stat-card-label">TOTAL KLIK</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card-num">840</div>
+            <div class="stat-card-label">PENGUNJUNG UNIK</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card-num">12</div>
+            <div class="stat-card-label">TOTAL LINKS</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card-num">4.5</div>
+            <div class="stat-card-label">RATA-RATA KLIK</div>
         </div>
     </div>
-</x-app-layout>
+
+    <div class="section-card">
+        <div class="section-card-header">
+            <div class="section-card-title">AKTIVITAS TERBARU</div>
+        </div>
+        <div class="section-card-body" style="padding: 24px;">
+            <p style="opacity: 0.6; font-size: 13px;">{{ __("Selamat datang kembali! Dashboard kamu sudah menggunakan desain Brutalist.") }}</p>
+        </div>
+    </div>
+</x-dashboard-layout>
