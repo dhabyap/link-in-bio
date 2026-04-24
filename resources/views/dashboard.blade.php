@@ -7,19 +7,19 @@
         <div class="stat-card">
             <div class="stat-card-delta">+12%</div>
             <div class="stat-card-num">1.2K</div>
-            <div class="stat-card-label">TOTAL KLIK</div>
+            <div class="stat-card-label">TOTAL VIEWS</div>
         </div>
         <div class="stat-card">
             <div class="stat-card-num">840</div>
-            <div class="stat-card-label">PENGUNJUNG UNIK</div>
+            <div class="stat-card-label">UNIQUE VISITORS</div>
         </div>
         <div class="stat-card">
-            <div class="stat-card-num">12</div>
+            <div class="stat-card-num">{{ Auth::user()->links()->count() }}</div>
             <div class="stat-card-label">TOTAL LINKS</div>
         </div>
         <div class="stat-card">
-            <div class="stat-card-num">4.5</div>
-            <div class="stat-card-label">RATA-RATA KLIK</div>
+            <div class="stat-card-num">4.5%</div>
+            <div class="stat-card-label">AVG CTR</div>
         </div>
     </div>
 
