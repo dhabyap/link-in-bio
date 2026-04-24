@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'LinkBio') }} — Satu Link untuk Semua</title>
+    <title>{{ config('app.name', 'LinkBio') }} – Satu Link untuk Semua</title>
     <meta name="description" content="Buat halaman profil link-in-bio kamu yang profesional dalam hitungan menit. Kelola semua link, tampilkan portfolio, dan bagikan ke semua orang.">
 
     <!-- Fonts -->
