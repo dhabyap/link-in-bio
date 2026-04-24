@@ -1,93 +1,69 @@
 <section>
-    <header>
-        <h2 class="text-lg font-medium text-gray-900">
-            {{ __('Profile Information') }}
-        </h2>
-
-        <p class="mt-1 text-sm text-gray-600">
-            {{ __("Update your account's profile information and email address.") }}
-        </p>
-    </header>
-
-    <form id="send-verification" method="post" action="{{ route('verification.send') }}">
-        @csrf
-    </form>
-
-    <form method="post" action="{{ route('profile.update') }}" class="mt-6 space-y-6" enctype="multipart/form-data">
+    <form method="post" action="{{ route('profile.update') }}" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 24px;">
         @csrf
         @method('patch')
 
-        <div>
-            <x-input-label for="name" :value="__('Name')" />
-            <x-text-input id="name" name="name" type="text" class="mt-1 block w-full" :value="old('name', $user->name)" required autofocus autocomplete="name" />
-            <x-input-error class="mt-2" :messages="$errors->get('name')" />
-        </div>
-
-        <div>
-            <x-input-label for="display_name" :value="__('Display Name')" />
-            <x-text-input id="display_name" name="display_name" type="text" class="mt-1 block w-full" :value="old('display_name', $user->display_name)" autocomplete="display_name" />
-            <x-input-error class="mt-2" :messages="$errors->get('display_name')" />
-        </div>
-
-        <div>
-            <x-input-label for="bio" :value="__('Bio')" />
-            <textarea id="bio" name="bio" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">{{ old('bio', $user->bio) }}</textarea>
-            <x-input-error class="mt-2" :messages="$errors->get('bio')" />
-        </div>
-
-        <div class="flex items-center gap-4">
-            <div>
-                <x-input-label for="theme_color" :value="__('Theme Color')" />
-                <input id="theme_color" name="theme_color" type="color" class="mt-1 block w-16 h-10 border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm p-1" value="{{ old('theme_color', $user->theme_color ?? '#000000') }}" />
-                <x-input-error class="mt-2" :messages="$errors->get('theme_color')" />
-            </div>
-
-            <div>
-                <x-input-label for="avatar" :value="__('Avatar')" />
-                <input id="avatar" name="avatar" type="file" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" />
-                <x-input-error class="mt-2" :messages="$errors->get('avatar')" />
-                @if($user->avatar_path)
-                    <p class="mt-2 text-xs text-gray-500">Current: {{ basename($user->avatar_path) }}</p>
-                @endif
-            </div>
-        </div>
-
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" name="email" type="email" class="mt-1 block w-full" :value="old('email', $user->email)" required autocomplete="username" />
-            <x-input-error class="mt-2" :messages="$errors->get('email')" />
-
-            @if ($user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && ! $user->hasVerifiedEmail())
-                <div>
-                    <p class="text-sm mt-2 text-gray-800">
-                        {{ __('Your email address is unverified.') }}
-
-                        <button form="send-verification" class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                            {{ __('Click here to re-send the verification email.') }}
-                        </button>
-                    </p>
-
-                    @if (session('status') === 'verification-link-sent')
-                        <p class="mt-2 font-medium text-sm text-green-600">
-                            {{ __('A new verification link has been sent to your email address.') }}
-                        </p>
+        <div class="profile-grid">
+            <div class="profile-avatar-section">
+                <div class="profile-avatar-big">
+                    @if($user->avatar_path)
+                        <img src="{{ asset('storage/' . $user->avatar_path) }}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                    @else
+                        {{ substr($user->name, 0, 1) }}
                     @endif
                 </div>
-            @endif
+                <input type="file" name="avatar" id="avatar" style="display: none;" onchange="document.getElementById('avatar-name').textContent = this.files[0].name">
+                <button type="button" class="btn btn-white" style="padding: 8px 12px; font-size: 11px;" onclick="document.getElementById('avatar').click()">GANTI FOTO</button>
+                <span id="avatar-name" style="font-size: 10px; opacity: 0.5;"></span>
+                @error('avatar') <p style="color:var(--red); font-size:10px; margin-top:4px;">{{ $message }}</p> @enderror
+            </div>
+
+            <div class="profile-info-section" style="display: flex; flex-direction: column; gap: 20px;">
+                <div style="display:flex; flex-direction:column; gap:6px;">
+                    <label class="input-label">Username</label>
+                    <input type="text" class="input" value="{{ $user->username }}" disabled style="background: #eee; cursor: not-allowed;">
+                    <p style="font-size: 10px; opacity: 0.5;">Username tidak dapat diubah.</p>
+                </div>
+
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div style="display:flex; flex-direction:column; gap:6px;">
+                        <label class="input-label">Nama Lengkap</label>
+                        <input type="text" name="name" class="input" value="{{ old('name', $user->name) }}" required>
+                        @error('name') <p style="color:var(--red); font-size:11px;">{{ $message }}</p> @enderror
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:6px;">
+                        <label class="input-label">Display Name (Judul Profil)</label>
+                        <input type="text" name="display_name" class="input" value="{{ old('display_name', $user->display_name) }}" placeholder="Nama yang muncul di publik">
+                        @error('display_name') <p style="color:var(--red); font-size:11px;">{{ $message }}</p> @enderror
+                    </div>
+                </div>
+
+                <div style="display:flex; flex-direction:column; gap:6px;">
+                    <label class="input-label">Bio Singkat</label>
+                    <textarea name="bio" class="input" style="height: 100px; resize: none;">{{ old('bio', $user->bio) }}</textarea>
+                    @error('bio') <p style="color:var(--red); font-size:11px;">{{ $message }}</p> @enderror
+                </div>
+
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div style="display:flex; flex-direction:column; gap:6px;">
+                        <label class="input-label">Email</label>
+                        <input type="email" name="email" class="input" value="{{ old('email', $user->email) }}" required>
+                        @error('email') <p style="color:var(--red); font-size:11px;">{{ $message }}</p> @enderror
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:6px;">
+                        <label class="input-label">Warna Tema</label>
+                        <div style="display: flex; gap: 12px; align-items: center;">
+                            <input type="color" name="theme_color" class="input" value="{{ old('theme_color', $user->theme_color ?? '#FFE500') }}" style="width: 80px; padding: 4px; height: 50px;">
+                            <span style="font-size: 11px; font-weight: 700;">{{ old('theme_color', $user->theme_color ?? '#FFE500') }}</span>
+                        </div>
+                        @error('theme_color') <p style="color:var(--red); font-size:11px;">{{ $message }}</p> @enderror
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <div class="flex items-center gap-4">
-            <x-primary-button>{{ __('Save') }}</x-primary-button>
-
-            @if (session('status') === 'profile-updated')
-                <p
-                    x-data="{ show: true }"
-                    x-show="show"
-                    x-transition
-                    x-init="setTimeout(() => show = false, 2000)"
-                    class="text-sm text-gray-600"
-                >{{ __('Saved.') }}</p>
-            @endif
+        <div style="display: flex; justify-content: flex-end;">
+            <button type="submit" class="btn">SIMPAN PROFIL</button>
         </div>
     </form>
 </section>
