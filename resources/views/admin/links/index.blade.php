@@ -1,68 +1,67 @@
-<x-app-layout>
+<x-dashboard-layout>
     <x-slot name="header">
-        <div class="flex justify-between items-center">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                {{ __('Manage Links') }}
-            </h2>
-            <a href="{{ route('admin.links.create') }}" class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 focus:bg-gray-700 active:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
-                {{ __('Add New Link') }}
-            </a>
-        </div>
+        KELOLA LINKS
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            @if(session('success'))
-                <div class="mb-4 font-medium text-sm text-green-600 bg-green-100 p-4 rounded-lg">
-                    {{ session('success') }}
-                </div>
-            @endif
+    @if(session('success'))
+        <div style="background: var(--yellow); border: var(--border-thick); padding: 16px; margin-bottom: 24px; font-weight: 700; box-shadow: var(--shadow);">
+            {{ session('success') }}
+        </div>
+    @endif
 
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead>
-                                <tr>
-                                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-widest">Order</th>
-                                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-widest">Title</th>
-                                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-widest">URL</th>
-                                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-widest">Status</th>
-                                    <th class="px-6 py-3 bg-gray-50 text-right text-xs font-medium text-gray-500 uppercase tracking-widest">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
-                                @forelse($links as $link)
-                                    <tr>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $link->order }}</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $link->title }}</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-blue-600">
-                                            <a href="{{ $link->url }}" target="_blank">{{ Str::limit($link->url, 30) }}</a>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $link->is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
-                                                {{ $link->is_active ? 'Active' : 'Inactive' }}
-                                            </span>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                            <a href="{{ route('admin.links.edit', $link) }}" class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</a>
-                                            <form action="{{ route('admin.links.destroy', $link) }}" method="POST" class="inline-block">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="text-red-600 hover:text-red-900" onclick="return confirm('Are you sure?')">Delete</button>
-                                            </form>
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500 text-italic">No links added yet.</td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
+    @if ($errors->any())
+        <div style="background: var(--red); color: white; border: var(--border-thick); padding: 16px; margin-bottom: 24px; font-weight: 700; box-shadow: var(--shadow);">
+            <ul style="margin: 0; padding-left: 20px;">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
+    <div class="section-card">
+        <div class="section-card-header">
+            <div class="section-card-title">SEMUA LINK — {{ $links->count() }} TOTAL</div>
+        </div>
+        <div class="section-card-body" id="links-list">
+            @forelse($links as $link)
+                <div class="link-item" data-id="{{ $link->id }}">
+                    <div class="drag-handle">⠿</div>
+                    <div class="link-info">
+                        <div class="link-title-text">{{ $link->title }}</div>
+                        <div class="link-url-text">{{ $link->url }}</div>
+                    </div>
+                    <div class="link-toggle {{ $link->is_active ? 'on' : '' }}"></div>
+                    <div class="link-actions">
+                        <a href="{{ route('admin.links.edit', $link) }}" class="link-btn">EDIT</a>
+                        <form action="{{ route('admin.links.destroy', $link) }}" method="POST" style="display:inline;">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="link-btn del" onclick="return confirm('Hapus link ini?')">✕</button>
+                        </form>
                     </div>
                 </div>
-            </div>
+            @empty
+                <div style="padding: 40px; text-align: center; opacity: 0.5; font-style: italic;">
+                    Belum ada link. Tambahkan melalui form di bawah!
+                </div>
+            @endforelse
         </div>
+
+        <form action="{{ route('admin.links.store') }}" method="POST" class="add-link-row">
+            @csrf
+            <input type="hidden" name="order" value="{{ ($links->max('order') ?? 0) + 1 }}">
+            <input type="hidden" name="is_active" value="1">
+            
+            <div style="display:flex; flex-direction:column; gap:4px; flex:1;">
+                <label class="input-label">Judul Link</label>
+                <input type="text" name="title" class="input" placeholder="Contoh: My Portfolio" required>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:4px; flex:1;">
+                <label class="input-label">URL (Link)</label>
+                <input type="url" name="url" class="input" placeholder="https://..." required>
+            </div>
+            <button type="submit" class="btn" style="padding: 14px 24px;">TAMBAH +</button>
+        </form>
     </div>
-</x-app-layout>
+</x-dashboard-layout>
